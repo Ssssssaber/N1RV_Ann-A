@@ -1,0 +1,22 @@
+<div class="col d-flex justify-content-center">
+  <div class="card" style="width: 40rem;">
+    <div class="card-body">
+      {% if service.image %}
+        <a href="{{ service.image.url }}" target="_blank">
+          <img class="border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ service.image.url }}">
+        </a>
+      {% endif %}
+      <h5 class="card-title">{{ service.title }}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">
+        <small>
+          {% if not service.is_published %}
+            <p class="text-danger">Услуга снята с публикации админом</p>
+          {% endif %}
+          {{ service.pub_date|date:"d E Y, H:i" }}<br>
+        </small>
+      </h6>
+      <p class="card-text">{{ service.description|truncatewords:10 }}</p>
+      <a href="{% url 'main:service_detail' service.id %}" class="card-link">Полное описание услуги</a>
+    </div>
+  </div>
+</div>

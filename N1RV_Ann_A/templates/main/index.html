@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}
+  Лента записей
+{% endblock %}
+{% block content %}
+  {% for service in page_obj %}
+    <article class="mb-5">
+      {% include "includes/service_card.html" %}
+    </article>
+  {% endfor %}
+  {% include "includes/paginator.html" %}
+{% endblock %}
