@@ -6,13 +6,9 @@ from django.core.paginator import Paginator
 from accounts.models import UserAccount
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import ProfileEditForm, ServiceForm, OrderForm
+from .utils import _check_suitable_datetime, _get_time
 
 POSTS_PER_PAGE = 10
-
-# Create your views here.
-def _get_time():
-    return datetime.datetime.now(datetime.timezone.utc)
-
 
 def profile_view(request, username):
     template_name = 'main/profile.html'
@@ -131,10 +127,17 @@ def order_create_view(request, service_id):
     )
 
     order_form = OrderForm(request.POST)
+    order_form.fields['service'].initial = service
+    order_form.fields['service'].disabled = True
     if order_form.is_valid():
+        res_time = datetime.datetime.combine(order_form.cleaned_data['serve_date'], order_form.cleaned_data['serve_time'])
+        if not _check_suitable_datetime(res_time): 
+            return redirect('main:service_detail', service_id=service_id) 
         order = order_form.save(commit=False)
         order.customer = request.user
-
+        print(res_time)
+        order.serve_time = res_time
+        print(order.serve_time)
         order.save()
 
     return redirect('main:service_detail', service_id=service_id)
@@ -151,10 +154,15 @@ def order_edit_view(request, service_id, order_id):
         order_form = OrderForm(request.POST)
         if not order_form.is_valid():
             return redirect('main:service_detail', service_id=service_id)
+        res_time = datetime.datetime.combine(order_form.cleaned_data['serve_date'], order_form.cleaned_data['serve_time'])
+        if not _check_suitable_datetime(res_time): 
+            return redirect('main:service_detail', service_id=service_id)       
         
         order.hairdresser = order_form.cleaned_data['hairdresser']
         order.service = order_form.cleaned_data['service']
-        order.serve_date = order_form.cleaned_data['serve_date']
+        print(res_time)
+        order.serve_time = res_time
+        print(order.serve_time)
         order.save()
 
         return redirect('main:service_detail', service_id=service_id)
@@ -210,12 +218,24 @@ def service_detail(request, service_id):
         Q(pk=service_id, pub_date__lte=current_date, is_published=True)
     )
 
-    orders = OrderedServices.objects.filter(Q(service=service, customer=request.user))
+    orders = OrderedServices.objects.filter(service=service.id, customer=request.user.id).order_by(
+        'serve_date'
+    )
 
+    for order in orders:
+        print(order.serve_date)
+
+    order_form = OrderForm()
+
+    suitable_hairdressers = Hairdresser.objects.filter(Q(services=service))
+
+    order_form.fields['hairdresser'].queryset = suitable_hairdressers
+    order_form.fields['service'].initial = service
+    order_form.fields['service'].disabled = True
     context = {
         'service': service,
         'orders': orders,
-        'form': OrderForm()
+        'form': order_form
     }
 
     return render(request, template, context)

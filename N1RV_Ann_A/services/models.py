@@ -62,13 +62,12 @@ class OrderedServices(PublishedModel):
     )
 
     serve_date = models.DateTimeField(("Дата и время оказания услуги"),
-                                    auto_now=False, auto_now_add=False,
-                                    help_text="Если установить дату и \
-время в будущем — можно делать записи к парикмахерам.")
+                                    auto_now=False, auto_now_add=False, editable=True,
+                                    help_text="Необходимо установить время встречи не менее, чем за день до встречи.")
 
     payed = models.BooleanField(default=False);
 
-    comment = models.TextField(verbose_name='комментарий')
+    comment = models.TextField(verbose_name='комментарий', null=True, blank=True)
 
     class Meta:
         ordering = ('created_at',)
@@ -76,4 +75,4 @@ class OrderedServices(PublishedModel):
         verbose_name_plural = 'Заказанные услуги'
 
     def __str__(self):
-        return self.text
+        return self.comment
