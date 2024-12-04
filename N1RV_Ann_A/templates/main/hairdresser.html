@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% block title %}
-  Публикации в категории {{ hairdresser.title }}
+  Страница {{ hairdresser.first_name }} {{ hairdresser.last_name }}
 {% endblock %}
 {% block content %}
-  <h1 class="text-center">Публикации в категории - {{ hairdresser.title }}</h1>
+  <h1 class="text-center"> {{ hairdresser.first_name }} {{ hairdresser.last_name }}</h1>
+  <a href="{{ hairdresser.image.url }}" target="_blank">
+    <img class="border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ service.image.url }}">
+  </a>
   <p class="col-6 offset-3 mb-5 lead text-center">{{ hairdresser.description }}</p>
-  {% for post in page_obj %}
+  {% for service in page_obj %}
     <article class="mb-5">  
       {% include "includes/service_card.html" %}
     </article>   

@@ -20,7 +20,7 @@
                 {{ service.pub_date|date:"d E Y, H:i" }}<br>
             </small>
         </h6>
-        <p class="card-text">{{ service.text|linebreaksbr }}</p>
+        <p class="card-text">{{ service.description|linebreaksbr }}</p>
         {% if user.is_staff %}
           <div class="mb-2">
             <a class="btn btn-sm text-muted" href="{% url 'main:edit_service' service.id %}" role="button">

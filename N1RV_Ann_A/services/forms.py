@@ -17,7 +17,6 @@ class OrderForm(ModelForm):
     class Meta:
         widgets = {
             'serve_date': DateInput(attrs={'type': 'date'}),
-            
         }
         
         fields = ('hairdresser', 'service', 'serve_date', 'serve_time', 'comment')
@@ -32,3 +31,10 @@ class ProfileEditForm(ModelForm):
     class Meta:
         model = UserAccount
         fields = ('first_name', 'last_name', 'email', 'hairdresser_preference')
+
+
+
+class HairdresserForm(ModelForm):
+    class Meta:
+        model = Hairdresser
+        fields = ('first_name', 'last_name', 'description', 'slug', 'image', 'services')

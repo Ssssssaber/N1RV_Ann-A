@@ -5,7 +5,7 @@ from django.db.models import Count, Q
 from django.core.paginator import Paginator
 from accounts.models import UserAccount
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import ProfileEditForm, ServiceForm, OrderForm
+from .forms import ProfileEditForm, ServiceForm, OrderForm, HairdresserForm
 from .utils import _check_suitable_datetime, _get_time
 
 POSTS_PER_PAGE = 10
@@ -14,13 +14,14 @@ def profile_view(request, username):
     template_name = 'main/profile.html'
 
     profile = get_object_or_404(UserAccount, username=username)
-    orders = OrderedServices.objects.select_related(
-        'hairdresser', 'service'
-    ).filter(
+    orders = OrderedServices.objects.filter(
         customer=profile.pk
     ).order_by(
         '-serve_date'
     )
+
+    for order in orders:
+        print(order.serve_date)
 
     page_obj = Paginator(orders, POSTS_PER_PAGE)
     page_obj = page_obj.get_page(request.GET.get('page'))
@@ -135,9 +136,7 @@ def order_create_view(request, service_id):
             return redirect('main:service_detail', service_id=service_id) 
         order = order_form.save(commit=False)
         order.customer = request.user
-        print(res_time)
-        order.serve_time = res_time
-        print(order.serve_time)
+        order.serve_date = res_time
         order.save()
 
     return redirect('main:service_detail', service_id=service_id)
@@ -160,9 +159,7 @@ def order_edit_view(request, service_id, order_id):
         
         order.hairdresser = order_form.cleaned_data['hairdresser']
         order.service = order_form.cleaned_data['service']
-        print(res_time)
-        order.serve_time = res_time
-        print(order.serve_time)
+        order.serve_date = res_time
         order.save()
 
         return redirect('main:service_detail', service_id=service_id)
@@ -190,6 +187,70 @@ def order_delete_view(request, service_id, order_id):
 
     return render(request, template_name, context)
 
+@user_passes_test(lambda u: u.is_staff)
+@login_required
+def hairdresser_create_view(request):
+    template_name = 'main/hairdresser-create.html'
+
+    hairdresser_form = HairdresserForm(request.POST, request.FILES)
+    if hairdresser_form.is_valid():
+        hairdresser = hairdresser_form.save(commit=False)
+        hairdresser.save()
+        return redirect('main:hairdresser_services', hairdresser_slug=hairdresser.slug)
+
+    context = {
+        'form': hairdresser_form
+    }
+    return render(request, template_name, context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+@login_required
+def hairdresser_edit_view(request, hairdresser_slug):
+    template_name = 'main/hairdresser-create.html'
+
+    hairdresser = get_object_or_404(OrderedServices, slug=hairdresser_slug)
+    form = HairdresserForm(instance=hairdresser)
+
+    if request.method == 'POST':
+        order_form = HairdresserForm(instance=hairdresser)
+        if not order_form.is_valid():
+            return redirect('main:hairdresser_services', hairdresser_slug=hairdresser.slug)
+
+        hairdresser.first_name = order_form.cleaned_data['first_name']
+        hairdresser.last_name = order_form.cleaned_data['last_name']
+        hairdresser.description = order_form.cleaned_data['description']
+        hairdresser.slug = order_form.cleaned_data['slug']
+        hairdresser.image = order_form.cleaned_data['image']
+        hairdresser.services = order_form.cleaned_data['services']
+    
+        hairdresser.save()
+
+        return redirect('main:hairdresser_services', hairdresser_slug=hairdresser.slug)
+
+    context = {
+        'form': form,
+        'hairdresser': hairdresser
+    }
+    return render(request, template_name, context)
+
+
+@user_passes_test(lambda u: u.is_staff)
+@login_required
+def hairdresser_delete_view(request, hairdresser_slug):
+    template_name = 'main/hairdresser_create.html'
+
+    hairdresser = get_object_or_404(Hairdresser, pk=order_id)
+
+    if request.method == 'POST':
+        hairdresser.delete()
+        return redirect('main:index')
+
+    context = {
+        'hairdresser': hairdresser
+    }
+
+    return render(request, template_name, context)
 
 # Create your views here.
 def index(request):
@@ -250,9 +311,9 @@ def hairdresser_services(request, hairdresser_slug):
     )
     current_date = _get_time()
 
-    services = hairdresser.service.related.all();
+    services = hairdresser.services.all();
 
-    page_obj = Paginator(posts, POSTS_PER_PAGE)
+    page_obj = Paginator(services, POSTS_PER_PAGE)
     page_obj = page_obj.get_page(request.GET.get('page'))
 
     context = {

@@ -20,9 +20,15 @@
           </li>
           {% if user.is_authenticated %}
             <div class="btn-group" role="group" aria-label="Basic outlined example">
-              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
-                  href="{% url 'main:create_service' %}">Создать услугу</a></button>
-              <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                {% if user.is_staff %}
+                    <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                        href="{% url 'main:create_service' %}">Создать услугу</a>
+                    </button>
+                    <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                        href="{% url 'main:create_hairdresser' %}">Добавить мастера</a>
+                    </button>
+                {% endif %}
+                <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                   href="{% url 'main:profile' user.username %}">{{ user.username }}</a></button>
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}

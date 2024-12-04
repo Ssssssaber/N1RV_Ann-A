@@ -15,7 +15,6 @@ class UserAccount(AbstractUser):
     hairdresser_preference = models.ManyToManyField(
         Hairdresser,
         verbose_name="Предпочтения по парикмахерам",
-        null=True,
         blank=True
     )
 

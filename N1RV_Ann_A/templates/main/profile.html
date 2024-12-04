@@ -18,11 +18,13 @@
     </ul>
   </small>
   <br>
-  <h3 class="mb-5 text-center">Публикации пользователя</h3>
-  {% for service in page_obj %}
-    <article class="mb-5">
-      {% include "includes/service_card.html" %}
+  <h3 class="mb-5 text-center">Записи пользователя</h3>
+  <div class="container h-100">
+  {% for order in page_obj %}
+    <article class="row h-100 justify-content-center align-items-center">
+      {% include "includes/orders-profile.html" %}
     </article>
+  </div>
   {% endfor %}
   {% include "includes/paginator.html" %}
 {% endblock %}

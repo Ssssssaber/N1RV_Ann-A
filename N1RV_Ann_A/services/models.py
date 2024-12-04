@@ -29,6 +29,9 @@ class Hairdresser(PublishedModel):
                             help_text="Идентификатор страницы для URL; \
 разрешены символы латиницы, цифры, дефис и подчёркивание.")
 
+    image = models.ImageField(verbose_name='Изображение',
+                              null=True, blank=True)
+
     services = models.ManyToManyField(
         Service,
         verbose_name="Оказываемые услуги"
@@ -64,6 +67,7 @@ class OrderedServices(PublishedModel):
     serve_date = models.DateTimeField(("Дата и время оказания услуги"),
                                     auto_now=False, auto_now_add=False, editable=True,
                                     help_text="Необходимо установить время встречи не менее, чем за день до встречи.")
+
 
     payed = models.BooleanField(default=False);
 
