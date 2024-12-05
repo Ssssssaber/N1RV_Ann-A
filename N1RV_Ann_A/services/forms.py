@@ -6,7 +6,7 @@ from django import forms
 class ServiceForm(ModelForm):
     class Meta:
         widgets = {
-            'pub_date':  DateInput()
+            'pub_date':  DateInput(attrs={'type': 'date'})
         }
         exclude = {}
         model = Service

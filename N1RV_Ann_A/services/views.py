@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import ProfileEditForm, ServiceForm, OrderForm, HairdresserForm
 from .utils import _check_suitable_datetime, _get_time
 
-POSTS_PER_PAGE = 10
+POSTS_PER_PAGE = 3
 
 def profile_view(request, username):
     template_name = 'main/profile.html'
@@ -186,6 +186,22 @@ def order_delete_view(request, service_id, order_id):
     }
 
     return render(request, template_name, context)
+
+def hairdresser_list(request):
+    template_name = 'main/hairdresser-list.html'
+    current_date = _get_time()
+    hairdressers = Hairdresser.objects.filter(
+        is_published=True).order_by('-created_at')
+
+    page_obj = Paginator(hairdressers, POSTS_PER_PAGE)
+    page_obj = page_obj.get_page(request.GET.get('page'))
+
+    context = {
+        'page_obj': page_obj
+    }
+
+    return render(request, template_name, context)
+
 
 @user_passes_test(lambda u: u.is_staff)
 @login_required

@@ -1,0 +1,34 @@
+<div class="col d-flex justify-content-center">
+    <div class="card" style="width: 40rem;">
+      <div class="card-body">
+        {% if hairdresser.image %}
+          <a href="{{ hairdresser.image.url }}" target="_blank">
+            <img class="border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ service.image.url }}">
+          </a>
+        {% endif %}
+        <h5 class="card-title">{{ hairdresser.first_name }} {{ hairdresser.last_name }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+          <small>
+            {% if not hairdresser.is_published %}
+              <p class="text-danger">Парикмахер в данный момент не активен</p>
+            {% endif %}
+          </small>
+        </h6>
+        <p class="card-text">{{ hairdresser.description|truncatewords:10 }}</p>
+        {% if hairdresser.is_published %}
+              <a href="{% url 'main:hairdresser_services' hairdresser.slug %}" class="card-link">Услуги парикмахера</a>
+        {% endif %}
+        {% if user.is_staff %}
+        <div class="mb-2">
+            <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                href="{% url 'main:edit_hairdresser' hairdresser.slug %}">Редактировать профиль мастера</a>
+            </button>
+            
+            <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                href="{% url 'main:delete_hairdresser' hairdresser.slug %}">Удалить профиль мастера</a>
+            </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>

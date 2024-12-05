@@ -1,10 +1,10 @@
 {% load static %}
 <header>
-  <nav class="navbar navbar-light" style="background-color: lightskyblue">
+  <nav class="navbar navbar-dark" style="background-color: darkblue">
     <div class="container">
       <a class="navbar-brand" href="{% url 'main:index' %}">
         <img src="{% static 'img/logo.png' %}" width="30" height="30" class="d-inline-block align-top" alt="">
-        Блогикум
+        N1RV_Ann-A
       </a>
       {% with request.resolver_match.view_name as view_name %}
         <ul class="nav  nav-pills">
@@ -20,6 +20,12 @@
           </li>
           {% if user.is_authenticated %}
             <div class="btn-group" role="group" aria-label="Basic outlined example">
+                <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                    href="{% url 'main:index' %}">Список услуг</a>
+                </button>
+                <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
+                    href="{% url 'main:hairdresser_list' %}">Список мастеров</a>
+                </button>
                 {% if user.is_staff %}
                     <button type="button" class="btn btn-outline-primary"><a class="text-decoration-none text-reset"
                         href="{% url 'main:create_service' %}">Создать услугу</a>

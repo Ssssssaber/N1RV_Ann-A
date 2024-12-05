@@ -10,7 +10,8 @@ urlpatterns = [
     path('services/<int:service_id>/delete/', views.service_delete_view,
          name='delete_service'),
     
-
+    path('hairdresser/list', views.hairdresser_list,
+         name='hairdresser_list'),
     path('hairdresser/create', views.hairdresser_create_view,
          name='create_hairdresser'),
     path('hairdresser/<slug:hairdresser_slug>/edit', views.hairdresser_edit_view,
