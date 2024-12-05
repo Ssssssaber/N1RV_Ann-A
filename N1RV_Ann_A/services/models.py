@@ -9,7 +9,7 @@ class Service(PublishedModel):
                                     auto_now=False, auto_now_add=False,
                                     help_text="Если установить дату и \
 время в будущем — можно делать отложенные публикации.")
-    price = models.PositiveIntegerField()
+    price = models.PositiveIntegerField(verbose_name='цена',)
 
     image = models.ImageField(verbose_name='Изображение',
                               null=True, blank=True)
@@ -69,7 +69,7 @@ class OrderedServices(PublishedModel):
                                     help_text="Необходимо установить время встречи не менее, чем за день до встречи.")
 
 
-    payed = models.BooleanField(default=False);
+    payed = models.BooleanField(verbose_name='цена', default=False);
 
     comment = models.TextField(verbose_name='комментарий', null=True, blank=True)
 

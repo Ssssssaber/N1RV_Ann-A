@@ -37,4 +37,4 @@ class ProfileEditForm(ModelForm):
 class HairdresserForm(ModelForm):
     class Meta:
         model = Hairdresser
-        fields = ('first_name', 'last_name', 'description', 'slug', 'image', 'services')
+        fields = ('first_name', 'last_name', 'description', 'image', 'services')

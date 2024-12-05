@@ -20,21 +20,20 @@ def profile_view(request, username):
         '-serve_date'
     )
 
-    for order in orders:
-        print(order.serve_date)
-
     page_obj = Paginator(orders, POSTS_PER_PAGE)
     page_obj = page_obj.get_page(request.GET.get('page'))
 
+    hairdressers = profile.hairdresser_preference.all()
+
     context = {
         'profile': profile,
-        'page_obj': page_obj
+        'page_obj': page_obj,
+        'hairdressers': hairdressers
     }
     return render(request, template_name, context)
 
 
 @login_required
-@user_passes_test(lambda u: u.is_staff)
 def edit_profile_view(request):
 
     form = ProfileEditForm(instance=request.user)
@@ -43,12 +42,12 @@ def edit_profile_view(request):
         form = ProfileEditForm(request.POST)
 
         if form.is_valid():
-            user = User.objects.get(pk=request.user.pk)
+            user = UserAccount.objects.get(pk=request.user.pk)
 
             user.first_name = form.cleaned_data['first_name']
             user.last_name = form.cleaned_data['last_name']
             user.email = form.cleaned_data['email']
-            hairdresser_preference = form.cleaned_data['hairdresser_preference']
+            user.hairdresser_preference.set(form.cleaned_data['hairdresser_preference'])
 
             user.save()
 
@@ -61,8 +60,6 @@ def edit_profile_view(request):
 @user_passes_test(lambda u: u.is_staff)
 @login_required
 def service_create_view(request):
-    # check if user is admin or not
-
     template_name = 'main/create.html'
     form = ServiceForm()
 
@@ -84,23 +81,26 @@ def service_create_view(request):
 def service_edit_view(request, service_id):
     template_name = 'main/create.html'
     service = get_object_or_404(Service, pk=service_id)
+    service_form = ServiceForm(instance=service)
+
+    context = {
+        'form': service_form
+    }
     if request.method == 'POST':
         service_form = ServiceForm(request.POST, request.FILES)
-        if request.user.pk != service.author.pk or not service_form.is_valid():
-            return redirect('main:post_detail', service_id=service_id)
+        if not service_form.is_valid():
+            return redirect('main:service_detail', service_id=service_id)
         service.description = service_form.cleaned_data['description']
         service.title = service_form.cleaned_data['title']
         service.pub_date = service_form.cleaned_data['pub_date']
         service.price = service_form.cleaned_data['price']
         service.image = service_form.cleaned_data['image']
         service.save()
-        return redirect('main:service_detail', service_id=service_id)
+        return render(request, template_name, context)
     else:
         service_form = ServiceForm(instance=service)
 
-    context = {
-        'form': service_form
-    }
+    
 
     return render(request, template_name, context)
 
@@ -225,20 +225,19 @@ def hairdresser_create_view(request):
 def hairdresser_edit_view(request, hairdresser_slug):
     template_name = 'main/hairdresser-create.html'
 
-    hairdresser = get_object_or_404(OrderedServices, slug=hairdresser_slug)
+    hairdresser = get_object_or_404(Hairdresser, slug=hairdresser_slug)
     form = HairdresserForm(instance=hairdresser)
 
     if request.method == 'POST':
-        order_form = HairdresserForm(instance=hairdresser)
+        order_form = HairdresserForm(request.POST, request.FILES)
         if not order_form.is_valid():
             return redirect('main:hairdresser_services', hairdresser_slug=hairdresser.slug)
 
         hairdresser.first_name = order_form.cleaned_data['first_name']
         hairdresser.last_name = order_form.cleaned_data['last_name']
         hairdresser.description = order_form.cleaned_data['description']
-        hairdresser.slug = order_form.cleaned_data['slug']
         hairdresser.image = order_form.cleaned_data['image']
-        hairdresser.services = order_form.cleaned_data['services']
+        hairdresser.services.set(order_form.cleaned_data['services'])
     
         hairdresser.save()
 
@@ -295,7 +294,9 @@ def service_detail(request, service_id):
         Q(pk=service_id, pub_date__lte=current_date, is_published=True)
     )
 
-    orders = OrderedServices.objects.filter(service=service.id, customer=request.user.id).order_by(
+    orders = OrderedServices.objects.filter(
+        service=service.id, 
+        customer=request.user.id).order_by(
         'serve_date'
     )
 
@@ -327,7 +328,7 @@ def hairdresser_services(request, hairdresser_slug):
     )
     current_date = _get_time()
 
-    services = hairdresser.services.all();
+    services = hairdresser.services.filter(is_published=True);
 
     page_obj = Paginator(services, POSTS_PER_PAGE)
     page_obj = page_obj.get_page(request.GET.get('page'))

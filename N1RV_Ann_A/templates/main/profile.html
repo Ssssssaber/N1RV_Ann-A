@@ -3,22 +3,35 @@
   Страница пользователя {{ profile.username }}
 {% endblock %}
 {% block content %}
-  <h1 class="mb-5 text-center ">Страница пользователя {{ profile.username }}</h1>
-  <small>
-    <ul class="list-group list-group-horizontal justify-content-center mb-3">
-      <li class="list-group-item text-muted">Имя пользователя: {% if profile.get_full_name %}{{ profile.get_full_name }}{% else %}не указано{% endif %}</li>
-      <li class="list-group-item text-muted">Регистрация: {{ profile.date_joined }}</li>
-      <li class="list-group-item text-muted">Роль: {% if profile.is_staff %}Админ{% else %}Пользователь{% endif %}</li>
-    </ul>
-    <ul class="list-group list-group-horizontal justify-content-center">
-      {% if user.is_authenticated and request.user == profile %}
-      <a class="btn btn-sm text-muted" href="{% url 'main:edit_profile' %}">Редактировать профиль</a>
-      <a class="btn btn-sm text-muted" href="{% url 'password_change' %}">Изменить пароль</a>
-      {% endif %}
-    </ul>
-  </small>
-  <br>
-  <h3 class="mb-5 text-center">Записи пользователя</h3>
+<div class=" d-flex justify-content-center"> 
+    
+   <div class="card" style="width: 40rem;">
+    <h1 class="mb-5 text-center ">Страница пользователя {{ profile.username }}</h1>
+    <h3 class="mb-5 text-center ">Любимые парикмахеры {{ profile.username }}</h1>
+    {% for hairdresser in hairdressers %}
+         <a class="mb-5 text-center " href="{% url 'main:hairdresser_services' hairdresser.slug %}">{{ hairdresser.slug }}</a>
+    {% endfor %}
+    <small>
+        <ul class="list-group list-group-horizontal justify-content-center mb-3">
+        <li class="list-group-item text-muted">Имя пользователя: {% if profile.get_full_name %}{{ profile.get_full_name }}{% else %}не указано{% endif %}</li>
+        <li class="list-group-item text-muted">Регистрация: {{ profile.date_joined }}</li>
+        <li class="list-group-item text-muted">Роль: {% if profile.is_staff %}Админ{% else %}Пользователь{% endif %}</li>
+        
+        </ul>
+        <ul class="list-group list-group-horizontal justify-content-center">
+
+        {% if user.is_authenticated and request.user == profile %}
+        <a class="btn btn-sm text-muted" href="{% url 'main:edit_profile' %}">Редактировать профиль</a>
+        <a class="btn btn-sm text-muted" href="{% url 'password_change' %}">Изменить пароль</a>
+        {% endif %}
+
+        
+        </ul>
+    </small>
+    <br>
+    <h3 class="mb-5 text-center">Записи пользователя</h3>
+  </div>
+</div>
   <div class="container h-100">
   {% for order in page_obj %}
     <article class="row h-100 justify-content-center align-items-center">

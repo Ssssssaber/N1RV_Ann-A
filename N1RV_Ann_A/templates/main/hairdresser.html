@@ -3,13 +3,21 @@
   Страница {{ hairdresser.first_name }} {{ hairdresser.last_name }}
 {% endblock %}
 {% block content %}
+<div class=" d-flex justify-content-center"> 
+    
+<div class="card" style="width: 40rem;">
+    <div class="card-body">
   <h1 class="text-center"> {{ hairdresser.first_name }} {{ hairdresser.last_name }}</h1>
   {% if hairdresser.image %}
     <a href="{{ hairdresser.image.url }}" target="_blank">
-      <img class="border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ service.image.url }}">
+      <img class="border-3 rounded img-fluid img-thumbnail mb-2 mx-auto d-block" src="{{ hairdresser.image.url }}">
     </a>
   {% endif %}
   <p class="col-6 offset-3 mb-5 lead text-center">{{ hairdresser.description }}</p>
+</div>
+
+</div>
+</div>
   {% for service in page_obj %}
     <article class="mb-5">  
       {% include "includes/service_card.html" %}
